@@ -1,0 +1,389 @@
+
+<html>
+    <head>
+        <title>Arkanoid</title>
+<style>
+    body{ 
+        background-image: url('arkanoid.png');
+         }
+        #block_container{
+           position: absolute;
+            border:solid #21DAFF;
+            background-color:rgba(255, 255, 255, 0.3) ;
+            border-radius: 5px; 
+            left: 180px;
+            width: 950px;
+            height: 500px;
+
+        }
+    .row{  
+        display: inline-block;
+        position: relative;
+        left: 200px;
+        margin: 5px;                   
+        padding:10px;
+        border-radius: 30px;
+    }
+    .columns{   
+        display: inline-block;
+        width: 90px;
+        background-color: blue;
+        margin: 5px;                   
+        padding:10px;
+        border-radius: 30px;
+    }
+     .columns2{   
+        display: inline-block;
+        width: 90px;
+        background-color: green;
+        margin: 5px;                   
+        padding:10px;
+        border-radius: 30px;
+    }
+    .columns1{   
+        display: inline-block;
+        width: 90px;
+        background-color: red;
+        margin: 5px;                   
+        padding:10px;
+        border-radius: 30px;
+    }
+    
+
+    .columnsHiden{
+        display: inline-block;
+        width: 90px;
+        margin: 5px;    
+        padding:10px;
+        border-radius: 30px;
+        overflow: hidden;
+    }
+
+    #plataform{
+        background-color: grey;
+        height: 20px;
+        width: 150px;
+        position: absolute;
+    }
+
+
+    #ball{
+        background-color: blue;
+        height: 20px;
+        width: 20px;
+        position: absolute;
+        border-radius: 10px; 
+    }
+
+    #pausa{
+    	display: inline-block;
+       left: 500px;
+        font-size: 40px; 
+        top: 100px; 
+        position: absolute; 
+        text-align: center;
+        display: none;
+    }
+
+    #fin{ 
+        font-size: 40px; 
+        left: 300px;
+        top: 100px; 
+        position: absolute; 
+        text-align: center;
+        display: none;
+    }
+       
+
+
+</style>
+    </head>
+    <body>
+    	<div id="block_container">
+		</div>
+        <img id="pausa" src="./pause.png" alt="pause">
+        <img id="controles" src="./controles.png" alt="pause->enter,empezar->espacio,direccio->flechas">
+       <img id="fin" src="./game-over.png" alt="game-over"> 
+
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"  crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+<script>
+
+
+
+	var stage = [
+            [{life: 0},{life: 0},{life: 0},{life: 0}], 
+            [{life: 1},{life: 1},{life: 1},{life: 1}],
+            [{life: 2},{life: 2},{life: 2},{life: 2}],
+            [{life: 3},{life: 3},{life: 3},{life: 3}],
+          	];
+
+
+for (var i = 0; i < stage.length; i++) {	
+$('#block_container').append("<div class='row'></div>");
+	for (var j = 0; j < stage[i].length; j++) {
+    if ( stage[i][j].life==1) {
+        $('.row:last-child').append("<div class='columns'></div>");
+	}if ( stage[i][j].life==2) {
+        $('.row:last-child').append("<div class='columns1'></div>");
+    }if ( stage[i][j].life==3) {
+        $('.row:last-child').append("<div class='columns2'></div>");
+    }
+    if( stage[i][j].life==0){
+        $('.row:last-child').append("<div class='columnsHiden'></div>");
+
+    }
+    }
+}
+
+             
+    var container=document.getElementById("block_container");
+    var block = document.getElementById("row");
+
+    var anchoPantalla =parseInt(window.getComputedStyle(container).getPropertyValue('width') );
+    var altoPantalla = parseInt(window.getComputedStyle(container).getPropertyValue('height')) ;
+    var start = false;                
+    var GameOver = false;             
+    var move = true;                                    
+    var ballY = 1;      
+    var ballX = 1;       
+    var plataformX = 20; 
+    var blockX=0;        
+    var Puntuacion = 0;       
+    
+    $('#block_container').append('<div id="plataform"></div><div');
+    var plataform = document.getElementById("plataform");
+    var plataformWidht = parseInt(window.getComputedStyle(plataform).getPropertyValue('width'));
+    var plataformHeight = parseInt(window.getComputedStyle(plataform).getPropertyValue('height'));
+    plataform.style.bottom = "0px";
+    var posPlataform = anchoPantalla/2 - plataformWidht/2;
+    plataform.style.left = posPlataform + "px"; 
+    
+$('#block_container').append('<div id="ball"></div><div');
+    var ball = document.getElementById("ball");
+     var ballWidth = parseInt(window.getComputedStyle(ball).getPropertyValue('width'));
+    var ballHeight = parseInt(window.getComputedStyle(ball).getPropertyValue('height'));
+    var posInicialball = anchoPantalla/2 - ballWidth/2;
+    ball.style.left = posInicialball + "px";
+    ball.style.bottom ="20px";                      
+
+    var pausa = document.getElementById("pausa");        
+     pausa.style.left = anchoPantalla/2 - parseInt(window.getComputedStyle(pausa).getPropertyValue('width'))/2 + "px";
+
+    var fin = document.getElementById("fin");
+    fin.style.left = anchoPantalla/2 - parseInt(window.getComputedStyle(fin).getPropertyValue('width'))/2 + "px";
+
+    document.onkeydown = moveplataform;
+    document.onkeyup = Stop;
+    document.onkeypress = empezar;
+        var B = 100;
+setInterval(function() {
+    $('#ball').css('background','rgb(0,0,'+B+')');
+    $('#plataform').css('background','rgb(0,0,'+B+')');
+    $('.columns').css('background','rgb(0,0,'+B+')');
+    $('.columns1').css('background','rgb(0,'+B+',0)');
+    $('.columns2').css('background','rgb('+B+',0,0)');
+
+
+  if(B <= 255) {B++;}
+  else {B = 100;
+}
+},10);
+
+    
+function empezar(evento) 
+{  
+    if (evento.keyCode == 32 && move && !start)            
+    {
+        setInterval(moveball, 5);
+        start = true;                   
+    }
+}
+
+function Stop(evento) 
+{
+    if (evento.keyCode == 13 && !GameOver) 
+    {
+        if(move == true)
+        {
+            pausa.style.display = "block";
+            move = false;                                                                      
+        }
+        else
+        {
+            pausa.style.display = "none";
+            move = true;
+        }
+    }     
+}
+
+function finDelJuego() 
+{
+    fin.style.display = "block";  
+    move = false;   
+    GameOver = true;
+}
+
+function moveplataform(evento)
+{
+    if(move)
+    {
+        var keyCodeCaracter = evento.keyCode;
+        var posicionXplataformActual = parseInt(plataform.style.left);
+
+        if(keyCodeCaracter == 37 && posicionXplataformActual >= plataformX)
+        {
+            plataform.style.left = posicionXplataformActual - plataformX + "px";
+            moveballAndPlataform(0);
+        }
+        else if(keyCodeCaracter == 37 && posicionXplataformActual < plataformX)
+        {
+            plataform.style.left = "0px";
+            moveballAndPlataform(1); 
+        }
+        else if(keyCodeCaracter == 39 && posicionXplataformActual + plataformWidht <= anchoPantalla - plataformX)
+        {
+            plataform.style.left = posicionXplataformActual + plataformX + "px";
+            moveballAndPlataform(2);
+        }
+        else if(keyCodeCaracter == 39 && posicionXplataformActual + plataformWidht > anchoPantalla - plataformX)
+        {
+            plataform.style.left = anchoPantalla - plataformWidht + "px";
+            moveballAndPlataform(3);
+        }
+    }
+}
+
+function moveballAndPlataform(opcion)
+{
+    if(!start)                                                                
+    {
+        var NewPositionXBall
+ = parseInt(ball.style.left);           
+        switch (opcion)
+        {
+            case 0:
+                ball.style.left = NewPositionXBall
+ - plataformX + "px";
+                break;
+            case 1:                    
+                ball.style.left = plataformWidht/2 - ballWidth/2 + "px";
+                break;
+            case 2:
+                ball.style.left = NewPositionXBall
+ + plataformX + "px";
+                break;
+            case 3:
+                ball.style.left = anchoPantalla - plataformWidht/2 - ballWidth/2 + "px";
+                break;
+        }
+    }
+}
+
+function moveball() 
+{
+    if (move) 
+    {    
+        
+       var topplataform = parseInt(window.getComputedStyle(plataform).getPropertyValue('top'));                
+        NewPositionYBall
+ = parseInt(window.getComputedStyle(ball).getPropertyValue('top'));
+        NewPositionXBall
+ = parseInt(ball.style.left);
+
+        if(NewPositionYBall
+ + ballHeight == topplataform || NewPositionYBall
+ == 0) 
+        {  
+                ballY = -ballY;
+         
+        }
+           if(NewPositionXBall
+ == anchoPantalla-ballWidth || NewPositionXBall
+ == 0) 
+        {
+            ballX = -ballX;
+        }    
+
+        if(NewPositionYBall+ ballHeight == topplataform && (NewPositionXBall
+ + ballWidth < parseInt(plataform.style.left) ||
+            NewPositionXBall
+ > parseInt(plataform.style.left)+ plataformWidht))
+            {
+                 finDelJuego();
+            }
+           
+
+    $('.row').each(function(){
+                var bounds = this.getBoundingClientRect();
+                if (bounds.bottom >= NewPositionYBall && bounds.top >= NewPositionYBall){
+                  $(this).children('.columns').each(function(){
+                    var bounds = this.getBoundingClientRect();
+                    if (bounds.left <= NewPositionXBall && bounds.right >= NewPositionXBall){
+                     $(this).addClass('columnsHiden');
+                    $(this).removeClass('columns');
+                    $(this).css('background','');
+                    }
+                     ballY = -ballY;
+                  })
+                 
+                  $(this).children('.columns1').each(function(){
+                    var bounds = this.getBoundingClientRect();
+                    if (bounds.left <= NewPositionXBall && bounds.right >= NewPositionXBall){
+                     $(this).addClass('columns');
+                    $(this).removeClass('columns1');
+                    $(this).css('background','');
+
+                    }
+
+                  })
+                  
+                  $(this).children('.columns2').each(function(){
+                    var bounds = this.getBoundingClientRect();
+                    if (bounds.left <= NewPositionXBall && bounds.right >= NewPositionXBall){
+                     $(this).addClass('columns1');
+                    $(this).removeClass('columns2');
+                    $(this).css('background','');
+
+                    }
+                  })
+
+                }
+              })
+
+
+
+
+
+        
+        ball.style.top = NewPositionYBall
+ + ballY + "px";
+        ball.style.left = NewPositionXBall
+ + ballX + "px";
+    }
+}
+
+</script>
+
+    </body> 
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
